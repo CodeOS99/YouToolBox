@@ -6,6 +6,7 @@
 // @author      CodeOS99
 // @description A userscript with many utility functions!
 // @grant       none
+// @license     MIT
 // ==/UserScript==
 
 (function () {
