@@ -26,6 +26,13 @@
     });
 
     function makeMenu() {
+        const style = document.createElement('style');
+            style.textContent = `
+                #main-menu button {
+                    cursor: pointer !important;
+                }`;
+        document.head.appendChild(style);
+
         let div = document.createElement('div');
         div.id = "main-menu";
         Object.assign(div.style, {
@@ -36,8 +43,8 @@
             display: 'flex',
             alignItems: 'center',
             gap: '1px',
-            cursor: 'move', // Make the whole group feel draggable
             userSelect: 'none',
+            flexDirection: 'column'
         });
 
         let mover = document.createElement('div');
@@ -53,6 +60,7 @@
             color: '#fff',
             fontWeight: 'bold',
             fontFamily: 'sans-serif',
+            cursor: 'move',
         });
         mover.textContent = 'Move';
 
@@ -71,7 +79,6 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'move',
         });
 
         let topMenuDiv = document.createElement('div');
@@ -102,7 +109,6 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'move',
             fontSize: '10px',
         });
 
@@ -119,7 +125,6 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'move',
             fontSize: '10px'
         });
 
@@ -136,13 +141,12 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'move',
             fontSize: '10px'
         });
 
-        let codeSandboxBtn = document.createElement('button');
-        codeSandboxBtn.innerText = "CODE"
-        Object.assign(codeSandboxBtn.style, {
+        let quickSettingsModeBtn = document.createElement('button');
+        quickSettingsModeBtn.innerText = "SETTINGS"
+        Object.assign(quickSettingsModeBtn.style, {
             top: '80px',
             left: '20px',
             width: '50px',
@@ -154,24 +158,34 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'move',
             fontSize: '10px'
         });
 
         topMenuDiv.appendChild(closeMenuBtn);
+        topMenuDiv.appendChild(quickSettingsModeBtn);
         topMenuDiv.appendChild(noteModeButton);
         topMenuDiv.appendChild(calculatorModeBtn);
-        topMenuDiv.appendChild(codeSandboxBtn);
 
-        let menuBtns = [noteModeButton, calculatorModeBtn, codeSandboxBtn];
+        let menuBtns = [noteModeButton, calculatorModeBtn, quickSettingsModeBtn];
         menuBtns.forEach(btn => {
-            btn.addEventListener('mouseover', () => {
+            btn.onmouseenter = () => {
                 btn.style.backgroundColor = 'gray';
-            });            
-            btn.addEventListener('mouseleave', () => {
+            }
+
+            btn.onmouseleave = () => {
                 btn.style.backgroundColor = lightGray;
-            });
+            }
+
+            btn.onmousedown = () => {
+                btn.style.backgroundColor = 'black'
+            }
         });
+
+        noteModeButton.onmouseup = () => {
+            noteInput.style.display = 'block';
+            calculatorDiv.style.display = 'none';
+            quickSettingsDiv.style.display = 'none';
+        }
 
         closeMenuBtn.onmouseover = () => {
             closeMenuBtn.style.backgroundColor = darkRed;
@@ -179,8 +193,14 @@
         closeMenuBtn.onmouseleave = () => {
             closeMenuBtn.style.backgroundColor = 'red';
         };
-        closeMenuBtn.onmousedown = () => {
+        closeMenuBtn.onmouseup = () => {
             closeMenuBtn.style.backgroundColor = darkerRed;
+            bottomMenuDiv.style.display = 'none';
+            topMenuDiv.style.display = 'none';
+
+            main_menu_btn.style.display = 'block';
+
+            btn.style.backgroundColor = lightGray;
         }
 
         let bottomMenuDiv = document.createElement('div');        
@@ -201,13 +221,17 @@
         });
 
         let noteInput = document.createElement('textarea');
-        
+        noteInput.value = localStorage.getItem('ytb_notes') || '';
+        noteInput.addEventListener('input', () => {
+            localStorage.setItem('ytb_notes', noteInput.value);
+        });
+
         const buttonLabels = [
             '7', '8', '9', '/',
             '4', '5', '6', '*',
             '1', '2', '3', '-',
             '0', '.', '=', '+',
-            'CLR', 'DEL'
+            'CLR', 'DEL', '(', ')',
         ];
         let calculatorBtns = [];
 
@@ -264,11 +288,16 @@
             }
 
             btn.onmouseleave = () => {
-                btn.style.backgroundColor = lightGray
+                btn.style.backgroundColor = lightGray;
+            }
+
+            btn.onmousedown = () => {
+                btn.style.backgroundColor = 'black'
             }
 
             btn.onmouseup = () => {
-                updateCalcExpr(btn.innerText);
+                btn.style.backgroundColor = lightGray;
+                updateCalcExpr(buttonLabels[i]);
             }
 
             calculatorBtnDiv.appendChild(btn);
@@ -291,7 +320,7 @@
             else if(val === '=') {
                 if(!'+-/*.'.includes(calculatorExpr[calculatorExpr.length - 1])) {
                     try {
-                        calculatorExpr = eval(calculatorExpr);
+                        calculatorExpr = eval(calculatorExpr).toString();
                     } catch(e) {
                         alert("You made an error in the expression!");
                         calculatorExpr = '0';
@@ -304,15 +333,108 @@
 
         let showCalculator = () => {
             calculatorDiv.style.display = 'flex'
-
+            quickSettingsDiv.style.display = 'none';
             noteInput.style.display = 'none';
         }
 
         bottomMenuDiv.appendChild(noteInput);
 
         calculatorModeBtn.onmousedown = () => {
+            calculatorModeBtn.style.backgroundColor = 'black';
             showCalculator();
         }
+
+        let quickSettingsDiv = document.createElement('div');
+        quickSettingsDiv.style.display = 'none';
+        
+        const layout = [0.5, 0.75, 1, 1.25, 1.5,
+                        144, 240, 360, 480, 720
+        ];
+
+        Object.assign(quickSettingsDiv.style, {
+            display: 'none',
+            gridTemplateColumns: 'repeat(5, 1fr)', // Equal size columns
+            gap: '6px',
+            padding: '10px',
+            justifyContent: 'center',
+            alignItems: 'center',
+        });
+
+
+        for(let btnSpec of layout) {
+            let btn = document.createElement('button');
+            if(btnSpec <= 1.5) {
+                if(btnSpec < 1)
+                    btn.innerText = `x${btnSpec} 🐌`
+                else if(btnSpec == 1)
+                    btn.innerText = `x${btnSpec} 🐍`
+                else
+                    btn.innerText = `x${btnSpec} 🐇`
+
+                btn.onmouseup = () => {
+                    let player = document.querySelector('video');
+                    player.playbackRate = btnSpec;
+                    btn.style.backgroundColor = lightGray;
+                }
+            } else {
+                btn.innerText = `${btnSpec}p`
+                btn.onclick = () => {
+                    // Video quality
+                    let qualityMap = {
+                        144: 'tiny',
+                        240: 'small',
+                        360: 'medium',
+                        480: 'large',
+                        720: 'hd720',
+                    };
+                    setQuality(qualityMap[btnSpec]);
+                }
+            }
+            Object.assign(btn.style, {
+                padding: '10px',
+                fontSize: '14px',
+                backgroundColor: lightGray,
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                width: '80px', 
+            });
+
+            btn.onmouseenter = () => {
+                btn.style.backgroundColor = 'gray';
+            }
+
+            btn.onmouseleave = () => {
+                btn.style.backgroundColor = lightGray;
+            }
+
+            btn.onmousedown = () => {
+                btn.style.backgroundColor = 'black'
+            }
+
+            quickSettingsDiv.appendChild(btn);
+        }
+
+        function setQuality(qualityLabel) {
+            const player = document.getElementById('movie_player');
+            if (player && player.setPlaybackQualityRange) {
+                player.setPlaybackQualityRange(qualityLabel);
+                player.setPlaybackQuality(qualityLabel);
+            }
+        }
+
+        function showQuickSettings() {
+            quickSettingsDiv.style.display = 'grid';
+            calculatorDiv.style.display = 'none';
+            noteInput.style.display = 'none';
+        }
+
+        quickSettingsModeBtn.onmouseup = () => {
+            showQuickSettings();
+        }
+
+        bottomMenuDiv.appendChild(quickSettingsDiv);
 
         mover.onmousedown = (e) => {
             if(!menuHeld) {
@@ -336,11 +458,9 @@
 
         main_menu_btn.onclick = () => {
             main_menu_btn.style.display = 'none';
-            //mover.style.display = 'none';
 
             topMenuDiv.style.display = 'flex';
             bottomMenuDiv.style.display = 'flex';
-            div.style.flexDirection = 'column';
         };
 
         div.appendChild(mover);
