@@ -123,9 +123,9 @@
             fontSize: '10px'
         });
 
-        let calculatorBtn = document.createElement('button');
-        calculatorBtn.innerText = "CALC."
-        Object.assign(calculatorBtn.style, {
+        let calculatorModeBtn = document.createElement('button');
+        calculatorModeBtn.innerText = "CALC."
+        Object.assign(calculatorModeBtn.style, {
             top: '80px',
             left: '20px',
             width: '50px',
@@ -160,10 +160,10 @@
 
         topMenuDiv.appendChild(closeMenuBtn);
         topMenuDiv.appendChild(noteModeButton);
-        topMenuDiv.appendChild(calculatorBtn);
+        topMenuDiv.appendChild(calculatorModeBtn);
         topMenuDiv.appendChild(codeSandboxBtn);
 
-        let menuBtns = [noteModeButton, calculatorBtn, codeSandboxBtn];
+        let menuBtns = [noteModeButton, calculatorModeBtn, codeSandboxBtn];
         menuBtns.forEach(btn => {
             btn.addEventListener('mouseover', () => {
                 btn.style.backgroundColor = 'gray';
@@ -187,7 +187,7 @@
         Object.assign(bottomMenuDiv.style, {
             width: '200px',
             height: '50px',
-            backgroundColor: '#444',  // make it visible
+            backgroundColor: '#444',
             marginLeft: '10px',
             borderRadius: '8px',
             display: 'none',
@@ -211,9 +211,27 @@
         ];
         let calculatorBtns = [];
 
+        let calculatorExpr = '';
+
+        let calculatorDiv = document.createElement('div');
+        Object.assign(calculatorDiv.style, {
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+        });
+
+        let calcExprH1 = document.createElement('h1');
+        calcExprH1.innerText = "0";
+        Object.assign(calcExprH1.style, {
+            backgroundColor: 'gray',
+            borderRadius: '5px',
+        })
+
+        calculatorDiv.appendChild(calcExprH1);
+
         let calculatorBtnDiv = document.createElement('div');
         Object.assign(calculatorBtnDiv.style, {
-            display: 'none',
+            display: 'grid',
             gridTemplateColumns: 'repeat(4, 50px)',
             gap: '6px',
             padding: '10px',
@@ -221,7 +239,9 @@
             alignItems: 'center'
         });
 
-        bottomMenuDiv.appendChild(calculatorBtnDiv);
+        calculatorDiv.appendChild(calculatorBtnDiv);
+
+        bottomMenuDiv.appendChild(calculatorDiv);
 
         for (let i = 0; i < buttonLabels.length; i++) {
             let btn  = document.createElement('button');
@@ -247,22 +267,50 @@
                 btn.style.backgroundColor = lightGray
             }
 
+            btn.onmouseup = () => {
+                updateCalcExpr(btn.innerText);
+            }
+
             calculatorBtnDiv.appendChild(btn);
 
             calculatorBtns.push(btn);
         }
-        let showCalculator = () => {
-            calculatorBtnDiv.style.display = 'grid';
-            for(let btn of calculatorBtns) {
-                btn.style.display = 'block';
+
+        function updateCalcExpr(val) {
+            if(val !== 'CLR' && val !== 'DEL' && val !== '=') {
+                if(calculatorExpr !== '0') calculatorExpr += val;
+                else calculatorExpr = val;
             }
+            else if(val === 'CLR') calculatorExpr = '0';
+            else if(val === 'DEL') {
+                calculatorExpr = calculatorExpr.substring(0, calculatorExpr.length-1)
+                if(calculatorExpr === '') {
+                    calculatorExpr = '0';
+                }
+            }
+            else if(val === '=') {
+                if(!'+-/*.'.includes(calculatorExpr[calculatorExpr.length - 1])) {
+                    try {
+                        calculatorExpr = eval(calculatorExpr);
+                    } catch(e) {
+                        alert("You made an error in the expression!");
+                        calculatorExpr = '0';
+                    }
+                }
+            }
+
+            calcExprH1.innerText = calculatorExpr;
+        }
+
+        let showCalculator = () => {
+            calculatorDiv.style.display = 'flex'
 
             noteInput.style.display = 'none';
         }
 
         bottomMenuDiv.appendChild(noteInput);
 
-        calculatorBtn.onmousedown = () => {
+        calculatorModeBtn.onmousedown = () => {
             showCalculator();
         }
 
