@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://www.youtube.com/watch*
 // @version     1.0
-// @author      -
+// @author      CodeOS99
 // @description A userscript with many utility functions!
 // @grant       none
 // ==/UserScript==
