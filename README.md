@@ -1,4 +1,5 @@
-# YouToolBox
+![YouToolBox](https://github.com/user-attachments/assets/c06a3719-cd1c-4d87-b58d-6007d07daa94)
+# YouToolBox!
 YouToolBox is a Youtube utility userscript!
 It features three main functions,
 ## Quick Settings
