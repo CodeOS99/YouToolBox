@@ -125,7 +125,7 @@
             color: '#fff',
             border: 'none',
             borderRadius: '4px',
-            fontSize: '10px'
+            fontSize: '10px',
         });
 
         let calculatorModeBtn = document.createElement('button');
@@ -136,6 +136,7 @@
             width: '50px',
             zIndex: 9999,
             marginLeft: '10px',
+            marginRight: '10px',
             fontSize: '14px',
             background: lightGray,
             color: '#fff',
@@ -152,7 +153,6 @@
             width: '50px',
             zIndex: 9999,
             marginLeft: '10px',
-            marginRight: '10px',
             fontSize: '14px',
             background: lightGray,
             color: '#fff',
@@ -225,6 +225,7 @@
         noteInput.addEventListener('input', () => {
             localStorage.setItem('ytb_notes', noteInput.value);
         });
+        noteInput.style.display = 'none';
 
         const buttonLabels = [
             '7', '8', '9', '/',
@@ -345,14 +346,13 @@
         }
 
         let quickSettingsDiv = document.createElement('div');
-        quickSettingsDiv.style.display = 'none';
         
         const layout = [0.5, 0.75, 1, 1.25, 1.5,
                         144, 240, 360, 480, 720
         ];
 
         Object.assign(quickSettingsDiv.style, {
-            display: 'none',
+            display: 'grid',
             gridTemplateColumns: 'repeat(5, 1fr)', // Equal size columns
             gap: '6px',
             padding: '10px',
